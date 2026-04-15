@@ -1,0 +1,108 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      date: \"2026-04-10\",\n      from: \"client1@test.com\",\n      subject: \"Need a quote\",\n      snippet: \"Can you send pricing?\"\n    }\n  },\n  {\n    json: {\n      date: \"2026-04-11\",\n      from: \"client2@test.com\",\n      subject: \"Bug report\",\n      snippet: \"I have a problem with your app\"\n    }\n  },\n  {\n    json: {\n      date: \"2026-04-12\",\n      from: \"client3@test.com\",\n      subject: \"Partnership\",\n      snippet: \"We want to collaborate\"\n    }\n  },\n  {\n    json: {\n      date: \"2026-04-13\",\n      from: \"client4@test.com\",\n      subject: \"Pricing question\",\n      snippet: \"What are your prices?\"\n    }\n  },\n  {\n    json: {\n      date: \"2026-04-14\",\n      from: \"client5@test.com\",\n      subject: \"Technical issue\",\n      snippet: \"There is a bug\"\n    }\n  },\n  {\n    json: {\n      date: \"2026-04-15\",\n      from: \"client6@test.com\",\n      subject: \"Hello\",\n      snippet: \"Just saying hi\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ac0d8de0-9d11-4a12-9ed6-2074f0560f15",
+      "name": "fake emails"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const text = item.json.snippet.toLowerCase();\n\n  let category = \"autre\";\n  let reply = \"\";\n  let status = \"ignoré\";\n\n  if (text.includes(\"quote\") || text.includes(\"pricing\")) {\n    category = \"commercial\";\n    reply = \"Merci pour votre demande, nous revenons vers vous rapidement.\";\n    status = \"répondu\";\n  } else if (text.includes(\"problem\") || text.includes(\"bug\")) {\n    category = \"support\";\n    reply = \"Nous avons bien reçu votre demande. Celle-ci sera traité dans les plus brefs délais.\";\n    status = \"répondu\";\n  }\n\n  return {\n    json: {\n      date: item.json.date,\n      from: item.json.from,\n      subject: item.json.subject,\n      category,\n      status,\n      reply\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c60d8995-6102-49b3-9909-61d7c6bd080b",
+      "name": "logic"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        0
+      ],
+      "id": "455e19a2-fbf7-4df2-91cf-710c24e55a2d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2dbea85e-a8f2-49e3-b859-f0fad38fb93d",
+      "name": "Webhook",
+      "webhookId": "3a594e58-b5b6-4465-9278-940204ad4aaa"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "fake emails": {
+      "main": [
+        [
+          {
+            "node": "logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "logic": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "fake emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5e63733e-ff9e-4548-9dc8-72fa2ee9dc89",
+  "meta": {
+    "instanceId": "2febc664903702348a75ea6d8e6bc43aff362224be95f850481c73b31f548f12"
+  },
+  "id": "OfaNlyLzYtbfnoys",
+  "tags": []
+}
